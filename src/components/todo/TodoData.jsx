@@ -4,8 +4,6 @@ const TodoData = (props) => {
     const {todoList} = props
     console.log("check props todoList: ", todoList);
 
-
-
     return (
         <>
             <div className='bodyTodoList'>
@@ -14,9 +12,9 @@ const TodoData = (props) => {
                     console.log("item: ", item);
                     return (
                         <div>
-                            <div className="todo-item">
+                            <div className="todo-item" key={item.id}>
                                 <div>{item.name}</div>
-                                <button>Delete</button>
+                                <button className="btnDelete">Delete</button>
                             </div>
                             
                         </div>

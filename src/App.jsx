@@ -8,17 +8,7 @@ import reactLogo from './assets/react.svg'
 // () => {}
 const App = () => {
 
-  const [todoList, setTodoList] = useState([
-    {id: 1, name: "tú 1"},
-    {id: 2, name: "tú 2"},
-  ])
-
-  const str = "khắc tú"
-  const age = 22
-  const data = {
-    address: "hà nội",
-    country: "vietnam"
-  }
+  const [todoList, setTodoList] = useState([])
 
   const addNewTodo = (name) => {
     const newTodo = {
@@ -38,12 +28,7 @@ const App = () => {
       <div className='todo-title'>Todo list</div>
       <div>
         <TodoNew addNewTodo={addNewTodo} />
-        <TodoData
-            name={str}
-            age={age}
-            data={data}
-            todoList={todoList}
-        />
+        <TodoData todoList={todoList} />
         <div className='todo-image'>
            <img className='logo' src={reactLogo} alt="" />
         </div>

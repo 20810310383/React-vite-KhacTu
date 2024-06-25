@@ -20,7 +20,13 @@ const TodoNew = (props) => {
 
     return (
         <>
-            <input value={valueInput} className='inpTxt' placeholder='Enter your task' type="text" onChange={(event) => {handleOnChange(event.target.value)}} />
+            <input  value={valueInput} 
+                    className='inpTxt' 
+                    placeholder='Enter your task' 
+                    type="text" 
+                    required
+                    onChange={(event) => {handleOnChange(event.target.value)}} 
+            />
             <button className='btnAdd' onClick={handleClick} >Add</button>
             <div>My text input: {valueInput}</div>
         </>

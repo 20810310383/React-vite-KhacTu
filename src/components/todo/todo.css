@@ -62,5 +62,13 @@
     display: flex;
     justify-content: space-between;
   }
-
+.btnDelete {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+}
   
