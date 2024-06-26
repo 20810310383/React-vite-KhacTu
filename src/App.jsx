@@ -3,6 +3,8 @@ import './components/todo/todo.css'
 import TodoNew from './components/todo/TodoNew'
 import TodoData from './components/todo/TodoData'
 import reactLogo from './assets/react.svg'
+import Header from './components/layout/header'
+import Footer from './components/layout/footer'
 
 
 // () => {}
@@ -32,21 +34,26 @@ const App = () => {
 
 
   return (
-    <div className='todo-container'>
-      <div className='todo-title'>Todo list</div>
-      <div>
-        <TodoNew addNewTodo={addNewTodo} />
+    <>
+      <Header />
+      <div className='todo-container'>
+        <div className='todo-title'>Todo list</div>
+        <div>
+          <TodoNew addNewTodo={addNewTodo} />
 
-        {
-          todoList.length > 0 ? <TodoData todoList={todoList} deleteTodo={deleteTodo} /> :
-          <>
-            <div className='todo-image'>
-              <img className='logo' src={reactLogo} alt="" />
-            </div>
-          </>          
-        }
+          {
+            todoList.length > 0 ? <TodoData todoList={todoList} deleteTodo={deleteTodo} /> :
+            <>
+              <div className='todo-image'>
+                <img className='logo' src={reactLogo} alt="" />
+              </div>
+            </>          
+          }
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
+    
   )
 }
 
