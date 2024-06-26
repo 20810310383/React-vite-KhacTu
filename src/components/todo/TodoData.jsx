@@ -11,13 +11,13 @@ const TodoData = (props) => {
                     console.log("index: ", index);
                     console.log("item: ", item);
                     return (
-                        <div>
+                        <>
                             <div className="todo-item" key={item.id}>
                                 <div>{item.name}</div>
                                 <button className="btnDelete">Delete</button>
-                            </div>
-                            
-                        </div>
+                                {/* <button className="btnEdit">Edit</button> */}
+                            </div>                            
+                        </>
                     )
                 })}
                 {/* 

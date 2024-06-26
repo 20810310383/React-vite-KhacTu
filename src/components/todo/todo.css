@@ -27,7 +27,8 @@
     background-color: blue;
 }
 .bodyTodoList {
-    padding-top: 30px;
+    padding: 20px;
+    border: 1px solid gray;
 }
 
 .logo {
@@ -61,13 +62,24 @@
   .todo-item {
     display: flex;
     justify-content: space-between;
+    margin-bottom: 10px;
+
+    
   }
+
 .btnDelete {
   background-color: red;
   color: white;
   border: none;
   padding: 10px 15px;
-  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.btnEdit {
+  background-color: yellow;
+  color: black;
+  border: none;
+  padding: 10px 15px;
   cursor: pointer;
   border-radius: 6px;
 }
