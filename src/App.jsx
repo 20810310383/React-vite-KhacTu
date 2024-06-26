@@ -5,6 +5,7 @@ import TodoData from './components/todo/TodoData'
 import reactLogo from './assets/react.svg'
 import Header from './components/layout/header'
 import Footer from './components/layout/footer'
+import { Outlet } from 'react-router-dom'
 
 
 // () => {}
@@ -51,6 +52,7 @@ const App = () => {
           }
         </div>
       </div>
+      <Outlet />
       <Footer />
     </>
     
