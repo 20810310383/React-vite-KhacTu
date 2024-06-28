@@ -1,5 +1,7 @@
-import { Button, Input } from 'antd';
+import { Button, Input, notification } from 'antd';
 import { useState } from 'react';
+import { createUserAPI } from '../../services/api.service';
+
 
 
 const UserForm = () => {
@@ -10,8 +12,26 @@ const UserForm = () => {
     const [phoneNumber, setPhoneNumber] = useState("") 
 
     // console.log("check form: ", fullName, email, password, phoneNumber);
-    const handleClickBtn = () => {
-        console.log("check state: ", {fullName, email, password, phoneNumber});
+    const handleClickBtn = async () => {
+        try {
+            const res = await createUserAPI(fullName, email, password, phoneNumber)
+            console.log("check res: ", res);
+
+            if(res.data){
+                notification.success({
+                    message: "create user",
+                    description: "tạo user thành công"
+                })
+            } else {
+                notification.error({
+                    message: "error create user",
+                    description: JSON.stringify(res.message)
+                })
+            }
+            console.log("check res.data: ", res.data);    
+        } catch(error) {
+
+        }
     }
 
     return (
