@@ -4,10 +4,7 @@ import { useEffect, useState } from 'react';
 
 const UserTable = () => {
 
-  const [dataUser, setDataUser] = useState([
-    {_id: "tú", fullName: 22, email: "hn"},
-    {_id: "dat", fullName: 23, email: "hcm"},
-  ])
+  const [dataUser, setDataUser] = useState([])
 
   // empty arr => run one
   useEffect(() => {
@@ -32,13 +29,9 @@ const UserTable = () => {
   ];
 
   const loadUser = async () => {
-    try {
       const res = await fetchAllUserAPI()
       console.log("res: ", res);
       setDataUser(res.data.data)
-    } catch(er) {
-
-    }
   }
   
   console.log("run render 222");
