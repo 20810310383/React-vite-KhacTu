@@ -1,16 +1,8 @@
 import { Space, Table, Tag } from 'antd';
-import { fetchAllUserAPI } from '../../services/api.service';
-import { useEffect, useState } from 'react';
 
-const UserTable = () => {
+const UserTable = (props) => {
 
-  const [dataUser, setDataUser] = useState([])
-
-  // empty arr => run one
-  useEffect(() => {
-    console.log("run useEffect 111");
-    loadUser()
-  }, [])
+  const {dataUser} = props
 
   const columns = [
       {
@@ -28,14 +20,7 @@ const UserTable = () => {
       
   ];
 
-  const loadUser = async () => {
-      const res = await fetchAllUserAPI()
-      console.log("res: ", res);
-      setDataUser(res.data.data)
-  }
   
-  console.log("run render 222");
-
   return (
       <Table columns={columns} dataSource={dataUser} rowKey={"_id"} />
   )
