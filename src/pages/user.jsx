@@ -8,21 +8,44 @@ const UserPage = () => {
 
     const [dataUser, setDataUser] = useState([])
 
+    const [current, setCurrent] = useState(1)
+    const [pageSize, setPageSize] = useState(10)
+    const [total, setTotal] = useState(0)
+
+
     // empty arr => run one
+    // not empty => value next !== vale prev
     useEffect(() => {
         loadUser()
-    }, [])
+    }, [current, pageSize])   // [] + condition
 
     const loadUser = async () => {
-        const res = await fetchAllUserAPI()
+        const res = await fetchAllUserAPI(current, pageSize)
         console.log("res: ", res);
-        setDataUser(res.data.data)
+
+        if(res.data){
+            setDataUser(res.data.data.result)
+            setCurrent(res.data.data.meta.current)
+            setPageSize(res.data.data.meta.pageSize)
+            setTotal(res.data.data.meta.total)
+
+        }
     }
 
+    console.log("check current: ", current);
+    console.log("check pageSize: ", pageSize);
+    
     return (
         <div style={{padding: "20px"}}>
             <UserForm loadUser={loadUser} />
-            <UserTable dataUser={dataUser} loadUser={loadUser} />
+            <UserTable  current={current}
+                        pageSize={pageSize}
+                        total={total}
+                        dataUser={dataUser} 
+                        loadUser={loadUser}  
+                        setCurrent={setCurrent}
+                        setPageSize={setPageSize}
+            />
         </div>
     )
 }

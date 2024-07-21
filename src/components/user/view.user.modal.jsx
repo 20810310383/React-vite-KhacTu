@@ -51,7 +51,7 @@ const ViewUserModal = (props) => {
             } else {
                 notification.error({
                     message: "error update avatar",
-                    description: JSON.stringify(resUpload.message)
+                    description: JSON.stringify(resUpdateAvatar.message)
                 })            
             }
 

@@ -13,9 +13,9 @@ const createUserAPI = (fullName, email, password, phoneNumber) => {
     return axios.post(URL_BACKEND, data)
 }
 
-const fetchAllUserAPI = () => {
+const fetchAllUserAPI = (current, pageSize) => {
 
-    const URL_BACKEND = "/api/v1/user"    
+    const URL_BACKEND = `/api/v1/user?current=${current}&pageSize=${pageSize}`    
     return axios.get(URL_BACKEND)
 }
 
@@ -64,11 +64,54 @@ const updateUserAvatarAPI = (avatar, _id, fullName, phoneNumber) => {
     return axios.put(URL_BACKEND, data)
 }
 
+const registerUserAPI = (fullName, email, password, phoneNumber) => {
+    
+    const URL_BACKEND = "/api/v1/user/register"
+    const data = {
+        fullName: fullName,
+        email: email,
+        password: password,
+        phone: phoneNumber
+    }
+    return axios.post(URL_BACKEND, data)
+}
+
+const loginAPI = ( email, password) => {
+    
+    const URL_BACKEND = "/api/v1/auth/login"
+    const data = {
+        
+        username: email,
+        password: password,
+        delay: 3000
+        
+    }
+    return axios.post(URL_BACKEND, data)
+}
+
+const getAccountAPI = () => {
+    
+    const URL_BACKEND = "/api/v1/auth/account"
+   
+    return axios.get(URL_BACKEND,)
+}
+
+const logoutAPI = () => {
+    
+    const URL_BACKEND = "/api/v1/auth/logout"
+   
+    return axios.post(URL_BACKEND,)
+}
+
 export {
     createUserAPI,
     fetchAllUserAPI,
     updateUserAPI,
     deleteUserAPI,
     handleUploadFile,
-    updateUserAvatarAPI
+    updateUserAvatarAPI,
+    registerUserAPI,
+    loginAPI,
+    getAccountAPI,
+    logoutAPI
 }
