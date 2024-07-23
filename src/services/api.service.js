@@ -103,6 +103,7 @@ const logoutAPI = () => {
     return axios.post(URL_BACKEND,)
 }
 
+
 export {
     createUserAPI,
     fetchAllUserAPI,

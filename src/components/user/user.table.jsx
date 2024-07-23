@@ -113,7 +113,8 @@ const UserTable = (props) => {
   // console.log(">> check data update: ", dataUpdate);
   const onChange = (pagination, filters, sorter, extra) => { 
     // setCurrent, setPageSize
-    console.log(">> check: pagination, filters, sorter, extra", pagination, filters, sorter, extra);
+    // console.log(">> check: pagination, filters, sorter, extra", pagination, filters, sorter, extra);
+    console.log(">> check: pagination", pagination);
 
     // nếu thay dổi trang: current
     if(pagination && pagination.current){

@@ -68,7 +68,7 @@ const Header = () => {
         }] : []),
 
         ...(user.id ? [{
-          label: `Xin chào cậu ${user.fullName}`,
+          label: `Xin chào ${user.fullName}`,
           key: 'setting',
           icon: <AliwangwangOutlined />,
           children: [
