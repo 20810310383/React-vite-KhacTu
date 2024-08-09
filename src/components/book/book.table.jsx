@@ -1,8 +1,10 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Space, Table } from "antd"
+import { Popconfirm, Space, Table, message, notification } from "antd"
 import { useState } from "react";
 import { ViewBookModal } from "./view.book";
 import { BookCreate } from "./book.create";
+import { BookUpdate } from "./book.update";
+import { deleteBookAPI } from "../../services/api.book";
 
 
 export const BookTable = (props) => {
@@ -11,11 +13,14 @@ export const BookTable = (props) => {
           current, setCurrent,
           pageSize, setPageSize,
           total, setTotal,
-          loadBook
+          loadBook, loadingTable, setLoadingTable
   } = props
 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isModalUpdate, setIsModalUpdate] = useState(false);
+  const [dataUpdate, setDataUpdate] = useState(null);
   const [dataDetail, setDataDetail] = useState(null)
+  // const [loadingTable, setLoadingTable] = useState(false)
 
 
 
@@ -102,14 +107,58 @@ export const BookTable = (props) => {
         title: 'Action',
         dataIndex: 'action',
         key: 'action',
-        render: (_, record) => (
+        render: (_, record) => (          
           <Space size="middle">
-            <EditOutlined style={{color: "orange"}} /> 
-            <DeleteOutlined style={{color: "red"}} />
+
+            <EditOutlined style={{color: "orange"}} onClick={() => {
+              console.log("record update: ", record);
+              setIsModalUpdate(true)
+              setDataUpdate(record)
+            }} /> 
+
+          <Popconfirm
+              title="Xoá sản phẩm Book"
+              description="Bạn có chắc chắn muốn xoá?"
+              onConfirm={() => {handleDeleteBook(record._id)}}
+              onCancel={cancel}
+              okText="Yes"
+              cancelText="No"
+            >
+              <DeleteOutlined style={{color: "red"}} />
+            </Popconfirm>
+            
           </Space>
         ),
     },
   ];
+
+  const handleDeleteBook = async (id) => {
+      try {
+        const res = await deleteBookAPI(id)
+        console.log("check res: ", res);
+
+        if(res.data){
+            notification.success({
+                message: "xoá book",
+                description: "xoá book thành công"
+            })
+            await loadBook()
+        } else {
+            notification.error({
+                message: "error delete book",
+                description: JSON.stringify(res.message)
+            })
+        }
+        console.log("check res.data: ", res.data);    
+      } catch(error) {
+
+      }
+  }
+
+  const cancel = (e) => {
+    console.log(e);
+    message.error('Huỷ xoá');
+  };
 
   const onChange = (pagination) => {
     console.log(">> check: pagination", pagination);
@@ -145,6 +194,7 @@ export const BookTable = (props) => {
                     showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} rows</div>) }
                 } }
                 onChange={onChange}
+                loading={loadingTable}
             />;
 
             <ViewBookModal 
@@ -153,6 +203,14 @@ export const BookTable = (props) => {
                 dataDetail={dataDetail}
                 setDataDetail={setDataDetail}
             
+            />
+
+            <BookUpdate 
+                loadBook={loadBook}
+                isModalUpdate={isModalUpdate}
+                setIsModalUpdate={setIsModalUpdate}
+                dataUpdate={dataUpdate}
+                setDataUpdate={setDataUpdate}
             />
 
         </>

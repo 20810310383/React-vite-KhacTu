@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { BookTable } from "../components/book/book.table"
 import { fetchAllBookAPI } from "../services/api.book"
 import { BookCreate } from "../components/book/book.create"
@@ -11,11 +11,11 @@ const BookPage = () => {
     const [pageSize, setPageSize] = useState(4)
     const [total, setTotal] = useState(0)
 
-    useEffect(() => {
-        loadBook()
-    }, [current, pageSize])
+    const [loadingTable, setLoadingTable] = useState(false)
+    
 
-    const loadBook = async () => {
+    const loadBook = useCallback( async () => {
+        setLoadingTable(true)
         const res = await fetchAllBookAPI(current, pageSize)
         console.log("res book: ", res);
 
@@ -25,7 +25,12 @@ const BookPage = () => {
             setPageSize(res.data.data.meta.pageSize)
             setTotal(res.data.data.meta.total)
         }
-    }
+        setLoadingTable(false)
+    },[current, pageSize])
+
+    useEffect(() => {
+        loadBook()
+    }, [loadBook])
  
     return (
         <div style={{padding: "30px"}}>
@@ -42,6 +47,8 @@ const BookPage = () => {
                 setPageSize={setPageSize}
                 total={total}
                 setTotal={setTotal}
+                loadingTable={loadingTable}
+                setLoadingTable={setLoadingTable}
             />
         </div>
     )

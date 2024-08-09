@@ -1,25 +1,14 @@
-import { AppstoreAddOutlined, SettingOutlined } from "@ant-design/icons"
-import { Button, Col, Form, Input, InputNumber, Modal, Row, Select, notification } from "antd"
-import { useState } from "react";
-import { PlusOutlined } from '@ant-design/icons';
-import { Image, Upload } from 'antd';
+import { PlusOutlined } from "@ant-design/icons";
+import { Col, Form, Image, Input, InputNumber, Modal, Row, Select, Upload, notification } from "antd"
+import { useEffect, useState } from "react";
+import { updateBookAPI } from "../../services/api.book";
 import { handleUploadFile } from "../../services/api.service";
-import { createBookAPI } from "../../services/api.book";
 
-const getBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-});
 
-export const BookCreate = (props) => {
+export const BookUpdate = (props) => {
 
-    const {loadBook} = props
-    const [size, setSize] = useState('large'); // default is 'middle'
+    const {loadBook, isModalUpdate, setIsModalUpdate, dataUpdate, setDataUpdate} = props
     const [form] = Form.useForm();
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
@@ -44,15 +33,91 @@ export const BookCreate = (props) => {
         // },
     ]);
 
-    const showModal = () => {
-        setIsModalOpen(true)
+
+    useEffect(() => {
+        console.log(">> check data update props: ", dataUpdate);
+        if(dataUpdate && dataUpdate._id){
+            
+            form.setFieldsValue({
+                id: dataUpdate._id,
+                mainText: dataUpdate.mainText,
+                author: dataUpdate.author,
+                price: dataUpdate.price,
+                quantity: dataUpdate.quantity,
+                category: dataUpdate.category
+            })
+            setPreviewImage(`${import.meta.env.VITE_BACKEND_URL}/images/book/${dataUpdate.thumbnail}`)
+        }
+    }, [dataUpdate])    
+
+    const updateBook = async (newThumbnail, values) => {
+        const { id, mainText, author, price, quantity, category } = values;
+        const resBook = await updateBookAPI(
+            id, newThumbnail, mainText, author, price, quantity, category
+        );
+
+        console.log("resBook Update: ", resBook);
+
+        if (resBook.data) {
+            handleCancel()
+            await loadBook();
+            notification.success({
+                message: "Update book",
+                description: "Cập nhật book thành công"
+            })
+
+        } else {
+            notification.error({
+                message: "Error update book",
+                description: JSON.stringify(resBook.message)
+            })
+        }
     }
 
-    const handleCancel = () => {        
+    const handleUpdate = async (values) => {
+
+        //không có ảnh previewImage + không có file => return
+        if (!selectedFile && !previewImage) {
+            notification.error({
+                message: "Error update book",
+                description: "Vui lòng upload ảnh thumbnail"
+            })
+            return;
+        }
+
+        let newThumbnail = "";
+        //có ảnh previewImage và không có file => không upload file
+        if (!selectedFile && previewImage) {
+            //do nothing
+            newThumbnail = dataUpdate.thumbnail;
+        } else {
+            //có ảnh previewImage và có file => upload file
+            const resUpload = await handleUploadFile(selectedFile, "book");
+            if (resUpload.data) {
+                //success
+                newThumbnail = resUpload.data.data.fileUploaded;
+            } else {
+                //failed
+                notification.error({
+                    message: "Error upload file",
+                    description: JSON.stringify(resUpload.message)
+                });
+                return;
+            }
+        }
+
+        //step 2: update book
+        await updateBook(newThumbnail, values);
+    }
+    
+
+    const handleCancel = () => {
         form.resetFields();
+        setIsModalUpdate(false)
+        setDataUpdate(null)
         setSelectedFile(null);
-        setPreviewImage(null);
-        setIsModalOpen(false)
+        setPreviewImage(null)
+
     }
 
     const formatNumber = (value) => {
@@ -65,62 +130,6 @@ export const BookCreate = (props) => {
     const parseNumber = (value) => {
         return value.replace(/\.\s?|(\.*)/g, '');
     };
-    
-    const handleSubmitBtn = async (values) => {
-        if (!selectedFile) {
-            notification.error({
-                message: "Error create book",
-                description: "Vui lòng upload ảnh thumbnail"
-            })
-            return;
-        }
-
-        try {
-            //step 1: upload file
-            const resUpload = await handleUploadFile(selectedFile, "book");
-            console.log("resUpload: ", resUpload);
-            if (resUpload.data) {
-                //success
-                const newThumbnail = resUpload.data.data.fileUploaded;
-                //step 2: create book
-                const { mainText, author, price, quantity, category } = values;
-
-                console.log("{ mainText, author, price, quantity, category, newThumbnail }: ", mainText, author, price, quantity, category, newThumbnail);
-                
-                const resBook = await createBookAPI(
-                    newThumbnail, mainText, author, price, quantity, category
-                );
-
-                console.log("resBook: ", resBook);
-
-                if (resBook.data) {
-                    handleCancel()
-                    await loadBook();
-                    notification.success({
-                        message: "Create book",
-                        description: "Tạo mới book thành công"
-                    })
-
-                } else {
-                    notification.error({
-                        message: "Error create book",
-                        description: JSON.stringify(resBook.message)
-                    })
-                }
-            } else {
-                //failed
-                notification.error({
-                    message: "Error upload file",
-                    description: JSON.stringify(resUpload.message)
-                })
-            }
-        } catch (error) {
-            notification.error({
-                message: "Error",
-                description: error.toString()
-            });
-        }
-    }
 
     const handleOnChangeFile = (event) => {
         if (!event.target.files || event.target.files.length === 0) {
@@ -137,86 +146,30 @@ export const BookCreate = (props) => {
         }
     }
 
-
-    const handleChange = async ({ fileList: newFileList, file }) => {
-        setFileList(newFileList);
-    
-        if (file.status === 'uploading') {
-          return;
-        }
-    
-        if (file.status === 'done' || file.status === 'error') {
-          setPreviewImage(null);
-          const previewFile = file.originFileObj || file;
-          const preview = await getBase64(previewFile);
-          setPreviewImage(preview);
-          setPreviewOpen(true);
-        }
-
-        if (file && file.originFileObj) {
-            setSelectedFile(file.originFileObj);
-            setPreviewImage(URL.createObjectURL(file.originFileObj));
-        }
-    };
-    
-    
-    const handlePreview = async (file) => {
-        if (!file.url && !file.preview) {
-        file.preview = await getBase64(file.originFileObj);
-        }
-        setPreviewImage(file.url || file.preview);
-        setPreviewOpen(true);
-    };
-
-
-    const uploadButton = (
-        <button
-            style={{
-                border: 0,
-                background: 'none',
-            }}
-            type="button"
-        >
-            <PlusOutlined />
-            <div
-                style={{
-                    marginTop: 8,
-                }}
-            >
-                Upload
-            </div>
-        </button>
-    );
-    
-    
     return (
-        <>
-            <div style={{
-                display: "flex",
-                justifyContent: "end",
-                marginBottom: "20px"
-            }}>
-                <Button type="primary" icon={<AppstoreAddOutlined />} size={size} onClick={showModal}>
-                        Thêm mới Books
-                </Button>
-                                 
-                <Modal  title="Create Book (uncontrolled component)" 
-                        open={isModalOpen} 
-                        onOk={() => form.submit()} 
-                        maskClosable={false}    // click ra ngoài không đóng modal, bắt buộc user phải ấn vào nút
-                        onCancel={handleCancel}
-                        okText={"Xác nhận tạo mới"}
-                        // okButtonProps={{
-                        //     loading: true
-                        // }}
-                >
-                    <Row gutter={16}>
+        <>                   
+            <Modal 
+                title="Chỉnh sửa book" 
+                open={isModalUpdate} 
+                onOk={() => form.submit()} 
+                onCancel={handleCancel}
+                maskClosable={false}
+                okText={"Xác nhận chỉnh sửa"}
+            >
+                <Row gutter={16}>
                         <Col xs={24} >                
                             <Form
                                 form={form}
-                                onFinish={handleSubmitBtn}
+                                onFinish={handleUpdate}
                                 layout="vertical"
                             >   
+
+                                <Form.Item 
+                                    label="Mã sản phẩm"
+                                    name="id"                                    
+                                >
+                                    <Input disabled />
+                                </Form.Item>
 
                                 <Form.Item 
                                     label="Tiêu đề"
@@ -312,31 +265,8 @@ export const BookCreate = (props) => {
                                     />
                                 </Form.Item>
 
+                                
                                 <div>
-                                    <Upload
-                                        action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
-                                        listType="picture-circle"
-                                        fileList={fileList}
-                                        onPreview={handlePreview}
-                                        onChange={handleChange}
-                                    >
-                                        {fileList.length >= 8 ? null : uploadButton}
-                                    </Upload>
-                                    {previewImage && (
-                                        <Image
-                                        wrapperStyle={{
-                                            display: 'none',
-                                        }}
-                                        preview={{
-                                            visible: previewOpen,
-                                            onVisibleChange: (visible) => setPreviewOpen(visible),
-                                            afterOpenChange: (visible) => !visible && setPreviewImage(''),
-                                        }}
-                                        src={previewImage}
-                                        />
-                                    )}
-                                </div> 
-                                {/* <div>
                                     <div>Ảnh thumbnail</div>
                                     <div>
                                         <label htmlFor='btnUpload' style={{
@@ -369,13 +299,12 @@ export const BookCreate = (props) => {
                                             </div>
                                         </>
                                     }
-                                </div> */}
+                                </div>
 
                             </Form>
                         </Col>
                     </Row>
-                </Modal>
-            </div>        
+            </Modal>
         </>
     )
 }
